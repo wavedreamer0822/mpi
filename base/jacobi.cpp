@@ -4,9 +4,9 @@ using namespace std;
 
 int main()
 {
-    const int col = 3000;
+    const int col = 16;
     const int row = 4;
-    const int step = 10;
+    const int step = 1;
     double A[row][col] = {0};
     double B[row][col] = {0};
     double buf_up[col] = {0};
@@ -48,13 +48,12 @@ int main()
         down = MPI_PROC_NULL;
     }
     int k = 0;
-    while(k<=step)
+    while(k<1)
     {
         MPI_Send(&A[0][0], col, MPI_DOUBLE, up, 0, MPI_COMM_WORLD);
         MPI_Send(&A[row - 1][0], col, MPI_DOUBLE, down, 99, MPI_COMM_WORLD);
-        MPI_Recv(&buf_up[0], col, MPI_DOUBLE, up, 99, MPI_COMM_WORLD, &status);
         MPI_Recv(&buf_down[0], col, MPI_DOUBLE, down, 0, MPI_COMM_WORLD, &status);
-        cout<<1<<endl;
+        MPI_Recv(&buf_up[0], col, MPI_DOUBLE, up, 99, MPI_COMM_WORLD, &status);
         for (int j = 1; j < col - 1; j++)
         {
             B[0][j] = 0.25*(buf_up[j] + A[1][j] + A[0][j - 1] + A[0][j + 1]);
@@ -80,18 +79,18 @@ int main()
         k++;
     }
     double t2 = MPI_Wtime();
-    cout<<"time = "<<t2 - t1 <<"s"<<endl;
-    // if(rank == 1)
-    // {
-    //     std::cout<<"rank = "<<rank<<endl;
-    //     for(int i = 0;i<row;i++)
-    //     {
-    //         for(int j = 0;j<col;j++)
-    //         {
-    //             std::cout<<A[i][j]<<",   ";
-    //         }
-    //         std::cout<<endl;
-    //     }
-    // }
+    //cout<<"time = "<<t2 - t1 <<"s"<<endl;
+    if(rank == 0)
+    {
+        std::cout<<"rank = "<<rank<<endl;
+        for(int i = 0;i<row;i++)
+        {
+            for(int j = 0;j<col;j++)
+            {
+                std::cout<<A[i][j]<<",   ";
+            }
+            std::cout<<endl;
+        }
+    }
     MPI_Finalize();
 }

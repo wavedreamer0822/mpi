@@ -5,7 +5,7 @@ using namespace std;
 
 int main()
 {
-    const int col = 2000;
+    const int col = 16;
     const int row = 4;
     const int step = 10;
     double A[row][col] = {0};
@@ -51,7 +51,7 @@ int main()
         down = MPI_PROC_NULL;
     }
     int k = 0;
-    while(k <= step)
+    while(k < 10)
     {
         MPI_Isend(&A[0][0],col,MPI_DOUBLE,up,99,MPI_COMM_WORLD, &requst[0]);
         MPI_Isend(&A[row - 1][0],col,MPI_DOUBLE,down,0,MPI_COMM_WORLD, &requst[1]);
@@ -64,9 +64,17 @@ int main()
                 B[i][j] = 0.25*(A[i - 1][j] + A[i + 1][j] + A[i][j - 1] + A[i][j + 1]);
             }
         }
+        if(rank == 0)
+        {
+            cout<<A[0][0]<<endl;
+        }
         for(int i = 0;i<4;i++)
         {
             MPI_Wait(&requst[i],&status[i]);
+        }
+        if(rank == 0)
+        {
+            cout<<A[0][0]<<endl;
         }
         for (int j = 1; j < col - 1; j++)
         {
@@ -85,20 +93,20 @@ int main()
         }
         k++;
     }
-    double t2 = MPI_Wtime();
-    cout<<"time = "<<t2 - t1<<"s"<<endl;
-    // if(rank == 1)
-    // {
-    //     std::cout<<"rank = "<<rank<<endl;
-    //     for(int i = 0;i<row;i++)
-    //     {
-    //         for(int j = 0;j<col;j++)
-    //         {
-    //             std::cout<<A[i][j]<<",   ";
-    //         }
-    //         std::cout<<endl;
-    //     }
-    // }
+    //double t2 = MPI_Wtime();
+   // cout<<"time = "<<t2 - t1<<"s"<<endl;
+    if(rank == 0)
+    {
+        std::cout<<"rank = "<<rank<<endl;
+        for(int i = 0;i<row;i++)
+        {
+            for(int j = 0;j<col;j++)
+            {
+                std::cout<<A[i][j]<<",   ";
+            }
+            std::cout<<endl;
+        }
+    }
 
     MPI_Finalize();
 

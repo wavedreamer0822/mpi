@@ -22,25 +22,40 @@ int main()
     MPI_Status status;
     MPI_Init(NULL, NULL);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Type_vector(3,2, 3, MPI_INT, &newtype);
+    MPI_Type_vector(3,1, 3, MPI_INT, &newtype);
     MPI_Type_commit(&newtype);
+    MPI_Request reqs;
+    MPI_Status stats;
+
     if(rank == 0) {
         for(i = 0; i < n; i++) {
             buffer[i] = i + 1;
         }
-        MPI_Send(&buffer, 1, newtype, 1, 99, MPI_COMM_WORLD);
+        MPI_Isend(&buffer, 1, newtype, 1, 99, MPI_COMM_WORLD,&reqs);
+        MPI_Wait(&reqs,&stats);
+
     }
     if(rank == 1) {
 
         for(int i = 0; i < n; i++) {
             buffer[i] = 100;
         }
-        MPI_Recv(&buffer, 1, newtype, 0, 99, MPI_COMM_WORLD, &status);
+        MPI_Irecv(&buffer, 1, newtype, 0, 99, MPI_COMM_WORLD, &reqs);
+        MPI_Wait(&reqs,&stats);
         int count;
         MPI_Get_count(&status,newtype,&count);
-        cout<<count<<endl;
+        //cout<<count<<endl;
         for(i = 0; i < n; i++) {
             printf("buffer[%d] is %d\n", i, buffer[i]);
+        }
+    }
+    
+    MPI_Barrier(MPI_COMM_WORLD);
+    if(rank == 0)
+    {
+        for(int i = 0;i<n;i++)
+        {
+            cout<<buffer[i]<<endl;
         }
     }
     MPI_Type_free(&newtype);

@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
     }
     else
         printf("Must specify %d processors. Terminating.\n", SIZE);
-
+    cout<<MPI_PROC_NULL<<endl;
     MPI_Finalize();
 
     return 0;

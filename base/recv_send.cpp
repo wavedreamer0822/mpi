@@ -13,6 +13,7 @@ int main(int argc, char*argv[])
     {
         strcpy(message,"Hello,process 1");
         MPI_Send(message,strlen(message),MPI_CHAR,1,99,MPI_COMM_WORLD);
+        cout<<message<<endl;
     }
     else if(myrank == 1)
     {
